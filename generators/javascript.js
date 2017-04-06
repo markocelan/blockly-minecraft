@@ -144,6 +144,8 @@ Blockly.JavaScript.init = function(workspace) {
   // Create a dictionary mapping desired function names in definitions_
   // to actual function names (to avoid collisions with user functions).
   Blockly.JavaScript.functionNames_ = Object.create(null);
+  // Create a dictionary of cleanup code to be printed after the code.
+  Blockly.JavaScript.cleanups_ = Object.create(null);
 
   if (!Blockly.JavaScript.variableDB_) {
     Blockly.JavaScript.variableDB_ =
@@ -175,11 +177,19 @@ Blockly.JavaScript.finish = function(code) {
   for (var name in Blockly.JavaScript.definitions_) {
     definitions.push(Blockly.JavaScript.definitions_[name]);
   }
+
+  // Convert the cleanups dictionary into a list.
+  var cleanups = [];
+  for (var name in Blockly.JavaScript.cleanups_) {
+    cleanups.push(Blockly.JavaScript.cleanups_[name]);
+  }
+
   // Clean up temporary data.
   delete Blockly.JavaScript.definitions_;
   delete Blockly.JavaScript.functionNames_;
+  delete Blockly.JavaScript.cleanups_;
   Blockly.JavaScript.variableDB_.reset();
-  return definitions.join('\n\n') + '\n\n\n' + code;
+  return definitions.join('\n\n') + '\n\n\n' + code + '\n\n\n' + cleanups.join('\n\n');
 };
 
 /**

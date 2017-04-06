@@ -138,11 +138,11 @@ Code.loadBlocks = function(defaultXml) {
     // Language switching stores the blocks during the reload.
     delete window.sessionStorage.loadOnceBlocks;
     var xml = Blockly.Xml.textToDom(loadOnce);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if (defaultXml) {
     // Load the editor with default starting blocks.
     var xml = Blockly.Xml.textToDom(defaultXml);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if ('BlocklyStorage' in window) {
     // Restore saved blocks in a separate thread so that subsequent
     // initialization is not affected from a failed load.
@@ -269,7 +269,7 @@ Code.tabClick = function(clickedName) {
     }
     if (xmlDom) {
       Code.workspace.clear();
-      Blockly.Xml.domToWorkspace(Code.workspace, xmlDom);
+      Blockly.Xml.domToWorkspace(xmlDom, Code.workspace);
     }
   }
 
@@ -293,7 +293,8 @@ Code.tabClick = function(clickedName) {
   if (clickedName == 'blocks') {
     Code.workspace.setVisible(true);
   }
-  Blockly.fireUiEvent(window, 'resize');
+//  Blockly.fireUiEvent(window, 'resize');
+  Blockly.svgResize(Code.workspace);
 };
 
 /**
@@ -371,7 +372,7 @@ Code.init = function() {
           // Account for the 19 pixel margin and on each side.
     }
   };
-  onresize();
+
   window.addEventListener('resize', onresize, false);
 
   var toolbox = document.getElementById('toolbox');
@@ -384,7 +385,12 @@ Code.init = function() {
        media: '../media/',
        rtl: rtl,
        toolbox: toolbox,
-       zoom: {enabled: true}
+       zoom: {controls: true,
+          wheel: true,
+          startScale: 1.0,
+          maxScale: 3,
+          minScale: 0.3,
+          scaleSpeed: 1.2}
       });
 
   // Add to reserved word list: Local variables in execution evironment (runJS)
@@ -421,6 +427,8 @@ Code.init = function() {
     Code.bindClick('tab_' + name,
         function(name_) {return function() {Code.tabClick(name_);};}(name));
   }
+  onresize();
+  Blockly.svgResize(Code.workspace);
 
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
@@ -470,7 +478,7 @@ Code.initLanguage = function() {
   document.getElementById('runButton').title = MSG['runTooltip'];
   document.getElementById('trashButton').title = MSG['trashTooltip'];
 
-  var categories = ['catMinecraft', 'catLogic', 'catLoops', 'catMath', 'catText', 
+  var categories = ['catMinecraft', 'catLogic', 'catLoops', 'catMath', 'catText',
                     'catVariables', 'catFunctions'];
   for (var i = 0, cat; cat = categories[i]; i++) {
     document.getElementById(cat).setAttribute('name', MSG[cat]);
