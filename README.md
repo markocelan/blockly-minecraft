@@ -1,4 +1,7 @@
-# Blockly
+# blockly-minecraft
+Blockly for Minecraft with [Raspberry Jam Mod](https://github.com/arpruss/raspberryjammod/releases) or an open-source alternative [Minetest](http://www.minetest.net) with [Raspberry Jam Mod for Minetest](https://github.com/arpruss/raspberryjammod-minetest)
+
+## built with Blockly
 
 Google's Blockly is a web-based, visual programming editor.  Users can drag
 blocks together to build programs.  All code is free and open source.
