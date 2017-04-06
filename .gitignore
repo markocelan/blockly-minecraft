@@ -6,3 +6,5 @@ npm-debug.log
 *.pyc
 *.komodoproject
 /nbproject/private/
+*compressed.js
+appengine/static/
