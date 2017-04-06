@@ -211,6 +211,11 @@ MCPI.turtleGo = function(distance) {
 };
 
 MCPI.socket = new WebSocket("ws://" + (location.search.length ? location.search.substr(1) : "127.0.0.1") + ":14711");
+var originalSocketSend = MCPI.socket.send
+MCPI.socket.send = function(data) {
+    console.log('SEND: '+ data);
+    return originalSocketSend.apply(this, arguments);
+};
 
 MCPI.timeoutFunction = function() {
    MCPI.socket.close();
