@@ -20,22 +20,22 @@
 'use strict';
 
 var XML_TEXT = ['<xml xmlns="http://www.w3.org/1999/xhtml">',
-  '  <block type="controls_repeat_ext" id="10" inline="true" x="21" y="23">',
+  '  <block type="controls_repeat_ext" inline="true" x="21" y="23">',
   '    <value name="TIMES">',
-  '      <block type="math_number" id="11">',
+  '      <block type="math_number">',
   '        <field name="NUM">10</field>',
   '      </block>',
   '    </value>',
   '    <statement name="DO">',
-  '      <block type="variables_set" id="139" inline="true">',
+  '      <block type="variables_set" inline="true">',
   '        <field name="VAR">item</field>',
   '        <value name="VALUE">',
-  '          <block type="lists_create_empty" id="171"></block>',
+  '          <block type="lists_create_empty"></block>',
   '        </value>',
   '        <next>',
-  '          <block type="text_print" id="78" inline="false">',
+  '          <block type="text_print" inline="false">',
   '            <value name="TEXT">',
-  '              <block type="text" id="189">',
+  '              <block type="text">',
   '                <field name="TEXT">Hello</field>',
   '              </block>',
   '            </value>',
@@ -44,7 +44,7 @@ var XML_TEXT = ['<xml xmlns="http://www.w3.org/1999/xhtml">',
   '      </block>',
   '    </statement>',
   '  </block>',
-  '</xml>'].join('/n');
+  '</xml>'].join('\n');
 
 function test_textToDom() {
   var dom = Blockly.Xml.textToDom(XML_TEXT);
@@ -59,9 +59,65 @@ function test_domToText() {
       text.replace(/\s+/g, ''));
 }
 
+function test_domToWorkspace() {
+  Blockly.Blocks.test_block = {
+    init: function() {
+      this.jsonInit({
+        message0: 'test',
+      });
+    }
+  };
+
+  var workspace = new Blockly.Workspace();
+  try {
+    var dom = Blockly.Xml.textToDom(
+        '<xml xmlns="http://www.w3.org/1999/xhtml">' +
+        '  <block type="test_block" inline="true" x="21" y="23">' +
+        '  </block>' +
+        '</xml>');
+    Blockly.Xml.domToWorkspace(dom, workspace);
+    assertEquals('Block count', 1, workspace.getAllBlocks().length);
+  } finally {
+    delete Blockly.Blocks.test_block;
+
+    workspace.dispose();
+  }
+}
+
 function test_domToPrettyText() {
   var dom = Blockly.Xml.textToDom(XML_TEXT);
   var text = Blockly.Xml.domToPrettyText(dom);
   assertEquals('Round trip', XML_TEXT.replace(/\s+/g, ''),
       text.replace(/\s+/g, ''));
+}
+
+/**
+ * Tests the that appendDomToWorkspace works in a headless mode.
+ * Also see test_appendDomToWorkspace() in workspace_svg_test.js.
+ */
+function test_appendDomToWorkspace() {
+  Blockly.Blocks.test_block = {
+    init: function() {
+      this.jsonInit({
+        message0: 'test',
+      });
+    }
+  };
+
+  try {
+    var dom = Blockly.Xml.textToDom(
+        '<xml xmlns="http://www.w3.org/1999/xhtml">' +
+        '  <block type="test_block" inline="true" x="21" y="23">' +
+        '  </block>' +
+        '</xml>');
+    var workspace = new Blockly.Workspace();
+    Blockly.Xml.appendDomToWorkspace(dom, workspace);
+    assertEquals('Block count', 1, workspace.getAllBlocks().length);
+    var newBlockIds = Blockly.Xml.appendDomToWorkspace(dom, workspace);
+    assertEquals('Block count', 2, workspace.getAllBlocks().length);
+    assertEquals('Number of new block ids',1,newBlockIds.length);
+  } finally {
+    delete Blockly.Blocks.test_block;
+    workspace.dispose();
+  }
 }
