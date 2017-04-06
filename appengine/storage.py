@@ -40,6 +40,7 @@ class Xml(db.Model):
   # A row in the database.
   xml_hash = db.IntegerProperty()
   xml_content = db.TextProperty()
+  create_date = db.DateTimeProperty(auto_now_add=True)
 
 forms = cgi.FieldStorage()
 if "xml" in forms:
